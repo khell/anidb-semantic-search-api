@@ -7,3 +7,4 @@ services:
       - 8080:8080
     environment:
       - TORCH_DEVICE=cpu
+      - TRUST_X_FORWARDED=1

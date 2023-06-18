@@ -32,9 +32,11 @@ gunicorn 'main:app' --workers 1 --timeout 60 --bind 127.0.0.1:8080
 ```
 TORCH_DEVICE=cpu gunicorn 'main:app' --workers 1 --timeout 60 --bind 127.0.0.1:8080
 ```
-5. First startup may be slow, as embeddings and dataset must be downloaded from Huggingface.
+5. You may want to configure `TRUST_X_FORWARDED` to any integer n, where n is the number of reverse proxies you are running behind (if any).
+6. First startup may be slow, as embeddings and dataset must be downloaded from Huggingface.
 
 # Running with Docker
 1. You can just use the prebuilt image with Docker Compose: `docker compose up -d`
 2. You might want to change the `TORCH_DEVICE` environment variable in the Compose file. It's set to run on `cpu` by default.
 3. Note that `mps` is not available through Docker even if running on Apple Silicon: https://github.com/pytorch/pytorch/issues/81224
+4. By default `TRUST_X_FORWARDED` is set to trust reverse proxies to a depth of 1. This is suitable for the default Compose configuration.
