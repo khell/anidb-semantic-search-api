@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response
+from flask import Flask, request
 from anidb_query_tool import AnidbIdQueryTool
 from logger import logger
 
@@ -17,5 +17,5 @@ def get_anidb_id():
     return { "error": "Missing query parameter `name` "}, 400
   
   match = tool.get_anidb_id(name)
-  app.logger.info(f"Matched `{name}` with {match}")
+  app.logger.info(f"[{request.remote_addr}] Matched `{name}` with {match}")
   return match, 200

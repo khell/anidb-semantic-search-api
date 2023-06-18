@@ -4,6 +4,7 @@ from huggingface_hub import hf_hub_download
 import torch
 from logger import logger
 import os
+import re
 
 # Change to "cpu" if not on Mac or "cuda" if available
 TORCH_DEVICE = torch.device(os.getenv("TORCH_DEVICE", "mps"))
@@ -36,7 +37,12 @@ class AnidbIdQueryTool:
       logger.info(f"Could not load embedding due to {e}.")
   
   def get_anidb_id(self, query: str):
-    query_embedding = self.embedder.encode(query, convert_to_tensor=True, device=TORCH_DEVICE)
+    query_fixed = self.strip_anidb_id(query)
+    query_embedding = self.embedder.encode(query_fixed, convert_to_tensor=True, device=TORCH_DEVICE)
     matches = util.semantic_search(query_embedding, self.embeddings, top_k=1)[0][0]
     matched_row = self.dataset[matches['corpus_id']]
     return { "id": f"anidb-{matched_row['id']}", "name": matched_row['title'], "score": matches["score"] }
+  
+  def strip_anidb_id(self, name: str):
+    # We didn't vectorize the actual ids, so to make compatible with older libraries let's strip them if present
+    return re.sub(r'\[?anidb-\d+\]?', '', name).strip()
