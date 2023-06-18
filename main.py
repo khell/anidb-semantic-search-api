@@ -19,3 +19,7 @@ def get_anidb_id():
   match = tool.get_anidb_id(name)
   app.logger.info(f"[{request.remote_addr}] Matched `{name}` with {match}")
   return match, 200
+
+@app.route('/healthcheck', methods=['GET'])
+def get_healthcheck():
+  return "OK", 200
