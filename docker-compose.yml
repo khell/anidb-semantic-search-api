@@ -8,3 +8,4 @@ services:
     environment:
       - TORCH_DEVICE=cpu
       - TRUST_X_FORWARDED=1
+      - RESULTS_COUNT=5

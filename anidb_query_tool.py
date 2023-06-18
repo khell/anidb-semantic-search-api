@@ -10,6 +10,8 @@ import re
 TORCH_DEVICE = torch.device(os.getenv("TORCH_DEVICE", "mps"))
 # Default embeddings were generated using this model
 MODEL = 'all-mpnet-base-v2'
+# The top-k results to surface
+RESULTS_COUNT = int(os.getenv("RESULTS_COUNT", 5))
 
 class AnidbIdQueryTool:
   embedder: SentenceTransformer = SentenceTransformer(MODEL)
@@ -39,9 +41,17 @@ class AnidbIdQueryTool:
   def get_anidb_id(self, query: str):
     query_fixed = self.strip_anidb_id(query)
     query_embedding = self.embedder.encode(query_fixed, convert_to_tensor=True, device=TORCH_DEVICE)
-    matches = util.semantic_search(query_embedding, self.embeddings, top_k=1)[0][0]
-    matched_row = self.dataset[matches['corpus_id']]
-    return { "id": f"anidb-{matched_row['id']}", "name": matched_row['title'], "score": matches["score"] }
+    matches = util.semantic_search(query_embedding, self.embeddings, top_k=RESULTS_COUNT)[0]
+
+    result = []
+    for matched_row in matches:
+      data = self.dataset[matched_row['corpus_id']]
+      result.append({ "id": f"anidb-{data['id']}",
+                      "name": data['title'],
+                      "language": data['language'],
+                      "score": matched_row["score"] if matched_row["score"] <= 1 else 1
+      })
+    return result
   
   def strip_anidb_id(self, name: str):
     # We didn't vectorize the actual ids, so to make compatible with older libraries let's strip them if present

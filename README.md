@@ -4,11 +4,13 @@ This repo contains a simple Python Flask webserver that hosts a single API:
 /api/anidb/id?name={series_name}
 ```
 
-Calling this API will download a pre-generated Pytorch embedding and Huggingface dataset for AniDB series titles from this Huggingface repo: https://huggingface.co/datasets/khellific/anidb-series-embeddings. The API will then load the embeddings into a [sentence-transformers](https://www.sbert.net/) model and perform the default cosine similarity search from the library of `series_name` and return the highest ranked match's AniDB id as JSON of the form:
+This API uses a pre-generated Pytorch embedding and Huggingface dataset for AniDB series titles from this Huggingface repo: https://huggingface.co/datasets/khellific/anidb-series-embeddings. The API loads the the embeddings into a [sentence-transformers](https://www.sbert.net/) model and performs a cosine similarity search from the library of `series_name` and returns the highest ranked matches' AniDB ids as JSON of the form:
 
 ```
-{ id: "anidb-id", "name": "anidb entry match title", "score": "similarity score" }
+[{ id: "anidb-id", "name": "anidb entry match title", "score": "similarity score" }]
 ```
+
+By default, the API will return up to five matches.
 
 This API is intended to be used with my [forked version of the HamaTV Plex agent](https://github.com/khell/Hama.bundle) to match anime series with AniDB entries, allowing users to disregard the typical naming conventions required for that agent to normally work.
 
@@ -40,3 +42,6 @@ TORCH_DEVICE=cpu gunicorn 'main:app' --workers 1 --timeout 60 --bind 127.0.0.1:8
 2. You might want to change the `TORCH_DEVICE` environment variable in the Compose file. It's set to run on `cpu` by default.
 3. Note that `mps` is not available through Docker even if running on Apple Silicon: https://github.com/pytorch/pytorch/issues/81224
 4. By default `TRUST_X_FORWARDED` is set to trust reverse proxies to a depth of 1. This is suitable for the default Compose configuration.
+
+# Increasing number of results
+1. Set `RESULTS_COUNT` environment variable to an integer value n for n results.
