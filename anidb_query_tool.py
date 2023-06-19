@@ -55,4 +55,4 @@ class AnidbIdQueryTool:
   
   def strip_anidb_id(self, name: str):
     # We didn't vectorize the actual ids, so to make compatible with older libraries let's strip them if present
-    return re.sub(r'\[?anidb-\d+\]?', '', name).strip()
+    return re.sub(r'[[{]?anidb[-\s]?\d+[]}]?', '', name, flags=re.IGNORECASE).strip()
