@@ -4,7 +4,7 @@ This repo contains a simple Python Flask webserver that hosts a single API:
 /api/anidb/id?name={series_name}
 ```
 
-This API uses a pre-generated Pytorch embedding and Huggingface dataset for AniDB series titles from this Huggingface repo: https://huggingface.co/datasets/khellific/anidb-series-embeddings. The API loads the the embeddings into a [sentence-transformers](https://www.sbert.net/) model and performs a cosine similarity search from the library of `series_name` and returns the highest ranked matches' AniDB ids as JSON of the form:
+This API uses a pre-generated Pytorch embedding and Huggingface dataset for AniDB series titles from this Huggingface repo: https://huggingface.co/datasets/khellific/anidb-series-embeddings. The API loads the the embeddings into memory, generates a new embedding of a user's query from the same [sentence-transformers](https://www.sbert.net/) model and then performs a cosine similarity search of the user query on those embeddings and returns the highest ranked matches' mapped AniDB ids as JSON of the form:
 
 ```
 [{ id: "anidb-id", "name": "anidb entry match title", "score": "similarity score" }]
